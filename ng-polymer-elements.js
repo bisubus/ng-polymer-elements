@@ -98,6 +98,8 @@
       angular.extend(allMappings, extendedMappings);
     }
 
+    var prefix = $injector.has('$ngPolymerPrefix') ? $injector.get('$ngPolymerPrefix') : 'ng';
+
     // A directive is created for each web component according to the mappings
     Object.keys(allMappings).forEach(function(tag) {
       var mappings = allMappings[tag];
@@ -106,7 +108,18 @@
         $window) {
 
         var scopeDefinition = {};
+
         var keys = Object.keys(mappings);
+        // Quick-n-dirty attribute prefix
+        keys.forEach(function(attr) {
+          var prefixedAttr = attr.replace(/^ng/, prefix);
+          if (attr !== prefixedAttr) {
+            mappings[prefixedAttr] = mappings[attr];
+            delete mappings[attr];
+          }
+        });
+
+        keys = Object.keys(mappings);
         keys.forEach(function(attr) {
           var mapped = mappings[attr];
 
